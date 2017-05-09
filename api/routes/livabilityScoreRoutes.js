@@ -1,8 +1,8 @@
 'use strict';
 module.exports = function(app) {
 
-  app.route('/score')
-    .get(function(req, res) {
-    	res.send("1234");
-    });
+  var controller = require('../controllers/livabilityScoreController');
+
+  app.route('/score/')
+    .get(controller.getLivabilityScore);
 };

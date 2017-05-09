@@ -4,9 +4,10 @@ var express = require('express'),
   mongoose = require('mongoose'),
   livabilityScore = require('./api/models/livabilityScoreModel'),
   bodyParser = require('body-parser');
-  
+  require('dotenv').config();
+
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/db'); 
+mongoose.connect('mongodb://localhost/db');
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
