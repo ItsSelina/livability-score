@@ -84,7 +84,10 @@ exports.getLivabilityScore = function(req, res) {
       recreationScore = recreationScore * 100/maxRecreation;
       if (recreationScore > 100) recreationScore = 100;
 
+      var livabilityScore = walkScore/6 + transitScore/6 + restaurantScore/3 + recreationScore/3;
+
       res.json({
+        "livabilityScore":livabilityScore,
         "walkScore":walkScore,
         "transitScore":transitScore,
         "restaurantScore":restaurantScore,
