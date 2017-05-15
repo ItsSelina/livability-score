@@ -1,6 +1,6 @@
 var express = require('express'),
   app = express(),
-  port = process.env.PORT || 3000,
+  port = 8080,
   mongoose = require('mongoose'),
   livabilityScore = require('./api/models/livabilityScoreModel'),
   bodyParser = require('body-parser');
