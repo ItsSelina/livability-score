@@ -104,12 +104,12 @@ exports.getLivabilityScore = function(req, res) {
     .then(values => {
       walkScore = values[0][0];
       transitScore = values[0][1];
-      restaurantScore = values[1];
-      recreationScore = (values[2] + values[3] + values[4]) * 100 / maxRecreation;
+      restaurantScore = Math.round(values[1]);
+      recreationScore = Math.round((values[2] + values[3] + values[4]) * 100 / maxRecreation);
 
       if (recreationScore > 100) recreationScore = 100;
 
-      livabilityScore = walkScore/6 + transitScore/6 + restaurantScore/3 + recreationScore/3;
+      livabilityScore = Math.round(walkScore/6 + transitScore/6 + restaurantScore/3 + recreationScore/3);
 
       res.json({
         "livabilityScore":livabilityScore,
