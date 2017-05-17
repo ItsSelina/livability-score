@@ -52,7 +52,7 @@ exports.getLivabilityScore = function(req, res) {
         if (error != null) reject(error);
         var walkScoreResponse = JSON.parse(body);
 
-        resolve([walkScoreResponse.walkscore, walkScoreResponse.transit.score]);
+        resolve([walkScoreResponse.walkscore, walkScoreResponse.transit["score"]]);
       });
     });
 
