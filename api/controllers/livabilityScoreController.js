@@ -13,42 +13,22 @@ var restaurantScore;
 var recreationScore;
 
 exports.getLivabilityScore = function(req, res) {
+  var walkScoreUrl = `http://api.walkscore.com/score?format=json&lat=${req.query.lat}&lon=${req.query.lng}&transit=1&bike=1&wsapikey=${process.env.WALKSCORE_KEY}`;
 
-  var restaurantOptions = {
-    url: `https://api.yelp.com/v3/businesses/search?latitude=${req.query.lat}&longitude=${req.query.lng}&radius=1000&term=restaurant`,
+  var yelpOptions = {
     headers: {
       'Authorization': `Bearer ${process.env.YELP_ACCESS_TOKEN}`
     }
   };
 
-  var gymOptions = {
-    url: `https://api.yelp.com/v3/businesses/search?latitude=${req.query.lat}&longitude=${req.query.lng}&radius=1000&term=gym`,
-    headers: {
-      'Authorization': `Bearer ${process.env.YELP_ACCESS_TOKEN}`
-    }
-  };
-
-  var parkOptions = {
-    url: `https://api.yelp.com/v3/businesses/search?latitude=${req.query.lat}&longitude=${req.query.lng}&radius=1000&term=park`,
-    headers: {
-      'Authorization': `Bearer ${process.env.YELP_ACCESS_TOKEN}`
-    }
-  };
-
-  var mallOptions = {
-    url: `https://api.yelp.com/v3/businesses/search?latitude=${req.query.lat}&longitude=${req.query.lng}&radius=1000&term=mall`,
-    headers: {
-      'Authorization': `Bearer ${process.env.YELP_ACCESS_TOKEN}`
-    }
-  };
-
-  var walkScoreOptions = {
-    url: `http://api.walkscore.com/score?format=json&lat=${req.query.lat}&lon=${req.query.lng}&transit=1&bike=1&wsapikey=${process.env.WALKSCORE_KEY}`
-  };
+  function getYelpOptions(type) {
+    yelpOptions.url = `https://api.yelp.com/v3/businesses/search?latitude=${req.query.lat}&longitude=${req.query.lng}&radius=1000&term=${type}`;
+    return yelpOptions;
+  }
 
   var fetchWalkScore = new Promise(
     function(resolve, reject) {
-      request(walkScoreOptions, function(error, response, body) {
+      request(walkScoreUrl, function(error, response, body) {
         if (error != null) reject(error);
         var walkScoreResponse = JSON.parse(body);
 
@@ -58,7 +38,7 @@ exports.getLivabilityScore = function(req, res) {
 
   var fetchRestaurantScore = new Promise(
     function(resolve, reject) {
-      request(restaurantOptions, function(error, response, body) {
+      request(getYelpOptions("restaurant"), function(error, response, body) {
         if (error != null) reject(error);
         var restaurantResponse = JSON.parse(body);
         restaurantScore = restaurantResponse.total/maxRestaurants * 100;
@@ -73,7 +53,7 @@ exports.getLivabilityScore = function(req, res) {
 
   var fetchGymScore = new Promise(
     function(resolve, reject) {
-      request(gymOptions, function(error, response, body) {
+      request(getYelpOptions("gym"), function(error, response, body) {
         if (error != null) reject(error);
         var gymResponse = JSON.parse(body);
 
@@ -83,7 +63,7 @@ exports.getLivabilityScore = function(req, res) {
 
   var fetchParkScore = new Promise(
     function(resolve, reject) {
-      request(parkOptions, function(error, response, body) {
+      request(getYelpOptions("park"), function(error, response, body) {
         if (error != null) reject(error);
         var parkResponse = JSON.parse(body);
         resolve(parkResponse.total);
@@ -92,7 +72,7 @@ exports.getLivabilityScore = function(req, res) {
 
   var fetchMallScore = new Promise(
     function(resolve, reject) {
-      request(mallOptions, function(error, response, body) {
+      request(getYelpOptions("mall"), function(error, response, body) {
         if (error != null) reject(error);
         var mallResponse = JSON.parse(body);
         resolve(mallResponse.total);
