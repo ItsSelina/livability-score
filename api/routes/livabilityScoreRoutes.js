@@ -5,4 +5,8 @@ module.exports = function(app) {
 
   app.route('/score/')
     .get(controller.getLivabilityScore);
+
+  app.use(function(req, res) {
+    res.status(404).send({error: req.originalUrl + ' not found'})
+  });
 };

@@ -6,11 +6,7 @@ const maxRecreation = 300;
 var mongoose = require('mongoose');
 var request = require('request');
 
-var livabilityScore;
-var walkScore;
-var transitScore;
-var restaurantScore;
-var recreationScore;
+var errorMessage = "Please enter valid coordinates";
 
 exports.getLivabilityScore = function(req, res) {
   var walkScoreUrl = `http://api.walkscore.com/score?format=json&lat=${req.query.lat}&lon=${req.query.lng}&transit=1&bike=1&wsapikey=${process.env.WALKSCORE_KEY}`;
@@ -32,7 +28,11 @@ exports.getLivabilityScore = function(req, res) {
         if (error != null) reject(error);
         var walkScoreResponse = JSON.parse(body);
 
-        resolve([walkScoreResponse.walkscore, walkScoreResponse.transit["score"]]);
+        var walkScore = walkScoreResponse.walkscore;
+        var transitScore = walkScoreResponse.transit;
+
+        if (!transitScore) reject(errorMessage);
+        else resolve([walkScore, transitScore["score"]]);
       });
     });
 
@@ -41,13 +41,18 @@ exports.getLivabilityScore = function(req, res) {
       request(getYelpOptions("restaurant"), function(error, response, body) {
         if (error != null) reject(error);
         var restaurantResponse = JSON.parse(body);
-        restaurantScore = restaurantResponse.total/maxRestaurants * 100;
+        var restaurantScore = restaurantResponse.total;
 
-        if (restaurantScore > 100) {
-          restaurantScore = 100;
+        if (!restaurantScore) reject(errorMessage);
+        else {
+          var restaurantScore = restaurantScore/maxRestaurants * 100;
+
+          if (restaurantScore > 100) {
+            restaurantScore = 100;
+          }
+
+          resolve(restaurantScore);
         }
-
-        resolve(restaurantScore);
       });
     });
 
@@ -57,7 +62,10 @@ exports.getLivabilityScore = function(req, res) {
         if (error != null) reject(error);
         var gymResponse = JSON.parse(body);
 
-        resolve(gymResponse.total);
+        var gymScore = gymResponse.total;
+
+        if (!gymScore) reject(errorMessage);
+        else resolve(gymScore);
       });
     });
 
@@ -66,7 +74,11 @@ exports.getLivabilityScore = function(req, res) {
       request(getYelpOptions("park"), function(error, response, body) {
         if (error != null) reject(error);
         var parkResponse = JSON.parse(body);
-        resolve(parkResponse.total);
+
+        var parkScore = parkResponse.total;
+
+        if (!parkScore) reject(errorMessage);
+        else resolve(parkScore);
       });
     });
 
@@ -75,21 +87,25 @@ exports.getLivabilityScore = function(req, res) {
       request(getYelpOptions("mall"), function(error, response, body) {
         if (error != null) reject(error);
         var mallResponse = JSON.parse(body);
-        resolve(mallResponse.total);
+
+        var mallScore = mallResponse.total;
+
+        if (!mallScore) reject(error);
+        else resolve(mallScore);
       });
     });
 
   Promise.all([fetchWalkScore, fetchRestaurantScore, fetchGymScore,
     fetchParkScore, fetchMallScore])
     .then(values => {
-      walkScore = values[0][0];
-      transitScore = values[0][1];
-      restaurantScore = Math.round(values[1]);
-      recreationScore = Math.round((values[2] + values[3] + values[4]) * 100 / maxRecreation);
+      var walkScore = values[0][0];
+      var transitScore = values[0][1];
+      var restaurantScore = Math.round(values[1]);
+      var recreationScore = Math.round((values[2] + values[3] + values[4]) * 100 / maxRecreation);
 
       if (recreationScore > 100) recreationScore = 100;
 
-      livabilityScore = Math.round(walkScore/6 + transitScore/6 + restaurantScore/3 + recreationScore/3);
+      var livabilityScore = Math.round(walkScore/6 + transitScore/6 + restaurantScore/3 + recreationScore/3);
 
       res.json({
         "livabilityScore":livabilityScore,
@@ -100,6 +116,7 @@ exports.getLivabilityScore = function(req, res) {
       });
     })
     .catch(function(e) {
+      res.json({"error":e});
       console.log(e);
     });
 };
