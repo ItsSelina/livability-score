@@ -35,7 +35,7 @@ exports.getLivabilityScore = function(req, res) {
         var walkScore = walkScoreResponse.walkscore;
         var transitScore = walkScoreResponse.transit;
 
-        if (!transitScore) reject(errorMessage);
+        if (typeof transitScore == 'undefined') reject(errorMessage);
         else resolve([walkScore, transitScore["score"]]);
       });
     });
@@ -47,7 +47,7 @@ exports.getLivabilityScore = function(req, res) {
         var restaurantResponse = JSON.parse(body);
         var restaurantScore = restaurantResponse.total;
 
-        if (!restaurantScore) reject(errorMessage);
+        if (typeof restaurantScore == 'undefined') reject(errorMessage);
         else {
           var restaurantScore = restaurantScore/maxRestaurants * 100;
 
@@ -68,7 +68,7 @@ exports.getLivabilityScore = function(req, res) {
 
         var gymScore = gymResponse.total;
 
-        if (!gymScore) reject(errorMessage);
+        if (typeof gymScore == 'undefined') reject(errorMessage);
         else resolve(gymScore);
       });
     });
@@ -81,7 +81,7 @@ exports.getLivabilityScore = function(req, res) {
 
         var parkScore = parkResponse.total;
 
-        if (!parkScore) reject(errorMessage);
+        if (typeof parkScore == 'undefined') reject(errorMessage);
         else resolve(parkScore);
       });
     });
@@ -94,7 +94,7 @@ exports.getLivabilityScore = function(req, res) {
 
         var mallScore = mallResponse.total;
 
-        if (!mallScore) reject(error);
+        if (typeof mallScore == 'undefined') reject(error);
         else resolve(mallScore);
       });
     });
