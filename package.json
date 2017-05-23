@@ -1,8 +1,8 @@
 {
-  "name": "livabilityScoreApi",
+  "name": "livability-score",
   "version": "1.0.0",
-  "description": "RESTful livabilityScoreApi",
-  "main": "index.js",
+  "description": "RESTful API to fetch LivabilityScore of a given location",
+  "main": "server.js",
   "scripts": {
     "start": "node ./bin/www"
   },
